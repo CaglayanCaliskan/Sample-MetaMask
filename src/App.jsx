@@ -5,6 +5,7 @@ import {
   useConnectModal,
   useAccount,
   useBalance,
+  useDisconnect,
 } from '@web3modal/react';
 import './App.css';
 
@@ -17,8 +18,10 @@ function App() {
   const {isOpen, open, close} = useConnectModal();
   const {account, isReady} = useAccount();
   const {data, error, isLoading, refetch} = useBalance({
-    addressOrName: 'vitalik.eth',
+    addressOrName: account.address,
   });
+  const disconnect = useDisconnect();
+
   console.log('account ', account);
   console.log('isReady ', isReady);
 
@@ -41,65 +44,55 @@ function App() {
     console.log('Need install MetaMask!');
   }
 
-  const connectWalletHandler = () => {
-    if (window.ethereum) {
-      window.ethereum
-        .request({method: 'eth_requestAccounts'})
-        .then((account) => {
-          accountChangedHandler(account[0]);
-        });
-    } else {
-      setErrorMessage('Install MetaMask');
-    }
-  };
+  // const connectWalletHandler = () => {
+  //   if (window.ethereum) {
+  //     window.ethereum
+  //       .request({method: 'eth_requestAccounts'})
+  //       .then((account) => {
+  //         accountChangedHandler(account[0]);
+  //       });
+  //   } else {
+  //     setErrorMessage('Install MetaMask');
+  //   }
+  // };
 
-  const accountChangedHandler = (newAccount) => {
-    setDefaultAccount(newAccount);
-    setConnButtonText('Connected');
-    getUserBalance(newAccount);
-  };
+  // const accountChangedHandler = (newAccount) => {
+  //   setDefaultAccount(newAccount);
+  //   setConnButtonText('Connected');
+  //   getUserBalance(newAccount);
+  // };
 
-  const getUserBalance = (userAddress) => {
-    window.ethereum
-      .request({method: 'eth_getBalance', params: [userAddress, 'latest']})
-      .then((balance) => {
-        console.log('balance:', balance);
-        setUserBalance(ethers.utils.formatEther(balance));
-      });
-  };
+  // const getUserBalance = (userAddress) => {
+  //   window.ethereum
+  //     .request({method: 'eth_getBalance', params: [userAddress, 'latest']})
+  //     .then((balance) => {
+  //       console.log('balance:', balance);
+  //       setUserBalance(ethers.utils.formatEther(balance));
+  //     });
+  // };
 
-  const addFooToUserAssets = async (userAddress) => {
-    try {
-      const wasAdded = await window.ethereum.request({
-        method: 'wallet_watchAsset',
-        params: {
-          type: 'ERC20',
-          options: {
-            address: userAddress,
-            symbol: 'FOO',
-            decimals: 18,
-          },
-        },
-      });
-      if (wasAdded) {
-        console.log('Token added to MetaMask');
-      } else {
-        console.log("Token wasn't added to MetaMask");
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  function ConnectToPhoneMetaMask() {
-    const origin = window.location.href.replace(/(^\w+:|^)\/\//, '');
-    const metamaskAppDeepLink = 'https://metamask.app.link/dapp/' + origin;
-    return (
-      <a href={metamaskAppDeepLink}>
-        <button>Connect to MetaMask on Mobile</button>
-      </a>
-    );
-  }
+  // const addFooToUserAssets = async (userAddress) => {
+  //   try {
+  //     const wasAdded = await window.ethereum.request({
+  //       method: 'wallet_watchAsset',
+  //       params: {
+  //         type: 'ERC20',
+  //         options: {
+  //           address: userAddress,
+  //           symbol: 'FOO',
+  //           decimals: 18,
+  //         },
+  //       },
+  //     });
+  //     if (wasAdded) {
+  //       console.log('Token added to MetaMask');
+  //     } else {
+  //       console.log("Token wasn't added to MetaMask");
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
 
   return (
     <div className='App'>
@@ -109,18 +102,7 @@ function App() {
       <h2>Address: {account.address}</h2>
       <Web3Modal config={config} />
       <button onClick={open}>Connect</button>
-      {/* <button onClick={connectWalletHandler}>{connButtonText}</button>
-      <br />
-      <br />
-      <button onClick={() => addFooToUserAssets(defaultAccount)}>
-        Add Foo to Assets
-      </button>
-      <br />
-      <br />
-      {<ConnectToPhoneMetaMask />}
-      <h2 style={{color: 'red'}}>{errorMessage}</h2>
-      <br />
-      <br /> */}
+      <button onClick={disconnect}>Disconnect</button>
     </div>
   );
 }

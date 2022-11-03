@@ -1,5 +1,11 @@
 import {useState} from 'react';
 import {ethers} from 'ethers';
+import {
+  Web3Modal,
+  useConnectModal,
+  useAccount,
+  useBalance,
+} from '@web3modal/react';
 import './App.css';
 
 function App() {
@@ -8,9 +14,32 @@ function App() {
   const [userBalance, setUserBalance] = useState(null);
   const [connButtonText, setConnButtonText] = useState('Connect Wallet');
 
-  // if (typeof window.ethereum !== 'undefined') {
-  //   console.log('MetaMask is installed!');
+  const {isOpen, open, close} = useConnectModal();
+  const {account, isReady} = useAccount();
+  const {data, error, isLoading, refetch} = useBalance({
+    addressOrName: 'vitalik.eth',
+  });
+  console.log('account ', account);
+  console.log('isReady ', isReady);
+
+  // if (account.address) {
+  //   setDefaultAccount(account.address);
   // }
+
+  const config = {
+    projectId: '2a3b76921352d314e321aa9f1a41d9a2',
+    theme: 'dark',
+    accentColor: 'default',
+    ethereum: {
+      appName: 'web3Modal',
+    },
+  };
+
+  if (typeof window.ethereum !== 'undefined') {
+    console.log('MetaMask is installed!');
+  } else {
+    console.log('Need install MetaMask!');
+  }
 
   const connectWalletHandler = () => {
     if (window.ethereum) {
@@ -74,9 +103,13 @@ function App() {
 
   return (
     <div className='App'>
-      <h2>Address: {defaultAccount}</h2>
-      <h2>Ballace: {userBalance}</h2>
-      <button onClick={connectWalletHandler}>{connButtonText}</button>
+      <h2>Ready: {isReady ? 'yes' : 'no'}</h2>
+      <h2>is connected: {account.isConnected ? 'Yes' : 'No'}</h2>
+      <h2>Connector: {account.connector?.id}</h2>
+      <h2>Address: {account.address}</h2>
+      <Web3Modal config={config} />
+      <button onClick={open}>Connect</button>
+      {/* <button onClick={connectWalletHandler}>{connButtonText}</button>
       <br />
       <br />
       <button onClick={() => addFooToUserAssets(defaultAccount)}>
@@ -86,6 +119,8 @@ function App() {
       <br />
       {<ConnectToPhoneMetaMask />}
       <h2 style={{color: 'red'}}>{errorMessage}</h2>
+      <br />
+      <br /> */}
     </div>
   );
 }

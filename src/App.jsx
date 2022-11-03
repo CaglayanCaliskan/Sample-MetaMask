@@ -63,10 +63,8 @@ function App() {
   };
 
   function ConnectToPhoneMetaMask() {
-    // const origin = window.location.href.replace(/(^\w+:|^)\/\//, '');
-    // console.log(origin);
-    const metamaskAppDeepLink =
-      'https://metamask.app.link/dapp/' + '192.168.1.5:8888';
+    const origin = window.location.href.replace(/(^\w+:|^)\/\//, '');
+    const metamaskAppDeepLink = 'https://metamask.app.link/dapp/' + origin;
     return (
       <a href={metamaskAppDeepLink}>
         <button>Connect to MetaMask on Mobile</button>
